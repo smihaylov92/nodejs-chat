@@ -7,6 +7,7 @@ var path  = require('path');
 
 app.use("/client", express.static(path.join(__dirname, 'client')));
 app.use("/lib", express.static(path.join(__dirname, 'lib')));
+app.use("/bower_components", express.static(path.join(__dirname, 'bower_components')));
 // app.use("server", express.static(path.resolve(__dirname + '/server')));
 
 var messageHistory = require('./server/messageHistory');

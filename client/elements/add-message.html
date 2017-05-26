@@ -1,0 +1,58 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="message-entry.html">
+
+<dom-module id="add-message">
+	<template>
+		<style>
+			:host {
+				width: 100%;
+				height: 50px;
+				display: flex;
+				flex-direction: row;
+			}
+
+			:host input {
+				flex-grow: 1;
+				text-indent: 10px;
+				font-size: 20px;
+			}
+
+			:host button {
+				width: 200px;
+				text-transform: uppercase;
+			}
+
+			:host button:hover {
+				cursor: pointer;
+			}
+		</style>
+
+		<input type="text" name="new_message" id="new_message">
+		<button id="send-button" on-tap="sendMessage">Send</button>
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'add-message',
+			  	properties: {
+			  		socket : Object
+			  	},
+
+			  	sendMessage: function(e){
+			  		var msgObj = {};
+
+					msgObj.message = this.$.new_message.value;
+					msgObj.timestamp = Utils.getTimestamp();
+
+					this.socket.emit('message', msgObj);
+					this.$.new_message.value = '';
+
+					return false;
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>

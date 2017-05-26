@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="message-entry">
+	<template>
+		<style>
+			:host {
+				display: block;
+				margin: 20px;
+				padding: 5px;
+				border: 1px solid #000000;
+			}
+
+			:host .text-wrapper {
+				font-size: 20px;
+			}
+
+			:host .date-wrapper {
+				font-size: 12px;
+			}
+		</style>
+
+		<!-- <div class="message-wrapper">  -->
+			<div class="text-wrapper">
+				<span>[[text]]</span>
+			</div>
+			<div class="date-wrapper">
+				<span>[[date]]</span>
+			</div>
+		<!-- </div> -->
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'message-entry',
+			  	properties: {
+			  		text: String,
+			  		date: String,
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>

@@ -1,0 +1,42 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="message-entry.html">
+
+<dom-module id="message-board">
+	<template>
+		<style>
+			:host {
+				display: block;
+				flex-grow: 1;
+				overflow: auto;
+			}
+		</style>
+
+		<div id="messageWrapper"></div>
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+
+			Polymer({
+			  	is: 'message-board',
+			  	properties: {
+			  		socket: {
+			  			type: Object,
+				  		observer: '_socketReady'
+				  	}
+			  	},
+			  	_socketReady: function(){
+			  		this.socket.on('message', function(msgObj){
+						var newMsg = document.createElement('message-entry');
+						newMsg.date = msgObj.timestamp;
+						newMsg.text = msgObj.message;
+
+						Polymer.dom(this.$.messageWrapper).appendChild(newMsg);
+					}.bind(this));
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>
