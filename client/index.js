@@ -1,16 +1,28 @@
-(function(){
-	// exposing io global
-	var socket = io();
+'use strict';
+// exposing io global
+var socket = io();
 
-	var form = document.querySelector('body > form'),
-		input = document.getElementById('new_message');
+var doc = document,
+	form = doc.querySelector('body > form'),
+	input = doc.getElementById('new_message'),
+	msgBoard = doc.getElementById('message_board');
 
-	form.onsubmit = function(){
-		socket.emit('chat message', input.value);
-		input.value = '';
+form.onsubmit = function(){
+	var msgObj = {};
 
-		return false;
-	};
-})();
+	msgObj.message = input.value;
+	msgObj.timestamp = Utils.getTimestamp();
 
+	socket.emit('message', msgObj);
+	input.value = '';
 
+	return false;
+};
+
+socket.on('message', function(msgObj){
+	var newMsg = doc.createElement('li');
+
+	newMsg.innerHTML = msgObj.timestamp + ' ' + msgObj.message;
+
+	msgBoard.appendChild(newMsg);
+});
