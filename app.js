@@ -11,7 +11,8 @@ app.use("/bower_components", express.static(path.join(__dirname, 'bower_componen
 // app.use("server", express.static(path.resolve(__dirname + '/server')));
 
 var messageHistory = require('./server/messageHistory');
-var users = {}; 
+var users = {},
+	notificationObj = {}; 
 
 
 messageHistory.init();
@@ -22,23 +23,27 @@ app.get('/', function(request, response){
 });
 
 io.on('connection', function(socket){
-	io.emit('ready');
-	console.log(socket.id + ' has connected');
-
 	socket.on('register', function(username){
 		socket.username = username;
 		if(messageHistory.getMessages().length){
 			messageHistory.broadcastMessageHistory(io, socket.id);
 		}
+
+		notificationObj.user = username;
+		notificationObj.event = 'connect';
+
+		io.emit('notification', notificationObj);
 	});
 
 	socket.on('disconnect', function(){
-		console.log('user disconnected');
+		notificationObj.user = socket.username;
+		notificationObj.event = 'disconnect';
+		io.emit('notification', notificationObj);
 	});
 
 	socket.on('message', function(msgObj){
 		msgObj.user = socket.username;
-		console.log(msgObj);
+
 		io.emit('message', msgObj);
 		messageHistory.addMessage(msgObj);
 	});

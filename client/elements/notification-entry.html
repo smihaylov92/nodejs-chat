@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="notification-entry">
+	<template>
+		<style>
+			:host {
+				display: block;
+				margin: 10px;
+				padding: 5px;
+				text-align: center;
+			}
+
+			:host-context([event="connect"]) {
+				color: green;
+			}
+
+			:host-context([event="disconnect"]) {
+				color: red;
+			}
+
+		</style>
+
+		<span>[[_getEventMessage(user, event)]]</span>
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'notification-entry',
+			  	properties: {
+			  		user: String,
+			  		event: {
+			  			type: String,
+			  			reflectToAttribute: true
+			  		},
+			  		_msgByEvent: {
+			  			type: Object,
+			  			value: {
+				  			'connect': '%s has connected.',
+				  			'disconnect': '%s has disconnected'
+				  		}
+			  		}
+			  	},
+			  	_getEventMessage: function(user, event){
+			  		return this._msgByEvent[event].replace('%s', user);
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>
