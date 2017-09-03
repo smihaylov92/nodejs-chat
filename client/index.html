@@ -12,10 +12,12 @@
 	</style>
 </head>
 <body>	
-    <link rel="import" href="./client/elements/chat-manager.html">
+    <link rel="import" href="./client/elements/app-controller.html">
 	<script type="text/javascript" src="./socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="./client/utils.js"></script>
-	<!-- <script type="text/javascript" src="./client/index.js"></script> -->
-	<chat-manager></chat-manager>
+	<script type="text/javascript">
+		var socket = io();
+	</script>
+	<app-controller></app-controller>
 </body>
 </html>

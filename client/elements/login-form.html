@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id='login-form'>
+	<template>
+		<style type="text/css">
+			:host {
+				width: 400px;
+				height: 200px;
+				position: absolute;
+				display: block;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				margin: auto;
+			}
+
+			:host input {
+				height: 50px;
+				width: 100%;
+				font-size: 30px;
+			}
+
+			:host button {
+				height: 50px;
+				width: 100%;
+				font-size: 30px;
+				text-transform: uppercase;
+			}
+		</style>
+ 
+		<input type="text" name="name" id="username" placeholder="Your Name"> 
+		<button on-tap="registerUser">Enter</button>
+	</template>
+	<script type="text/javascript">
+		(function () {
+			Polymer({
+				is: 'login-form',
+				properties: {
+					socket: Object
+				},
+
+				registerUser: function(){
+					var username = this.$.username.value;
+					if(username){
+						socket.username = username;
+						socket.emit('register', username);
+
+						this.fire('app-route-change', 'chat-manager');
+					}
+				}
+			})
+		})(); 
+	</script>
+
+</dom-module>

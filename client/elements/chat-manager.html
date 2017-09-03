@@ -13,23 +13,15 @@
 			}
 		</style>
 
-		<message-board socket='[[socket]]'></message-board>
-		<add-message socket='[[socket]]'></add-message>
+		<message-board></message-board>
+		<add-message></add-message>
 	</template>
 
 	<script>
 		(function(){
 			'use strict';
 			Polymer({
-			  	is: 'chat-manager',
-			  	properties: {
-			  		socket: Object
-			  	},
-			  	ready: function(){		
-			  		this.socket = io();	
-
-			  		console.log(this.socket);
-			  	}
+			  	is: 'chat-manager'
 			});
 		})();
 	</script>

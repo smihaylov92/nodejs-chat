@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="login-form.html">
+<link rel="import" href="chat-manager.html">
+<link rel="import" href="view-manager.html">
+
+<dom-module id="app-controller">
+  	<template>
+	    <style>
+			:host {
+				display: block;
+				height: 100%;
+				width: 100%;
+			}
+	    </style>
+
+    	<view-manager current-view="[[route]]">
+    		<view-item name="login">
+    			<login-form></login-form>
+    		</view-item>
+    		<view-item name="chat-manager">
+    			<chat-manager></chat-manager>
+    		</view-item>
+    	</view-manager>
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'app-controller',
+			  	properties: {
+			  		route: {
+			  			type: String,
+			  			value: "login" // login, chat-manager
+			  		}
+			  	},
+			  	listeners: {
+			  		'app-route-change': 'onAppRouteChange'
+			  	},
+			  	onAppRouteChange: function(e, route){
+			  		this.route = route;
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>

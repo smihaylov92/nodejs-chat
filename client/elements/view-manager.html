@@ -1,0 +1,83 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="view-manager">
+  	<template>
+	    <style>
+			:host {
+	            display: block;
+	            height: 100%;
+	            width: 100%;
+	        }
+	        :host ::slotted(view-item) {
+	        	display: block;
+	        	position: relative;
+	        	height: 100%;
+	        	width: 100%;
+	        }
+	        :host ::slotted(view-item:not([selected])) {
+	            display: none;
+	        }
+	    </style>
+
+		<slot></slot>
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+				is: 'view-item'
+			});
+
+			Polymer({
+				is: 'view-manager',
+				properties: {
+	                currentView: {
+	                    type: String,
+	                    value: "login",
+	                    notify: true,
+	                    observer: '_updateView'
+	                }
+	            },
+	            // listeners: {
+	            //     'current-view-change': '_updateView'
+	            // },
+	            ready: function() {
+	            	var view = window.location.hash.slice(1);
+	                if(view !== '') {
+	                    this.currentView = view;
+	                }
+	                this.__views = {};
+	                this.__initElements();
+	            },
+	            /**
+	             * creates a data structure of views and their names
+	             */
+	            __initElements: function() {
+	                Polymer.dom(this).querySelectorAll('view-item')
+	                    .forEach(function(item, index) {
+	                        var viewName = item.getAttribute('name');
+	                        this.__views[viewName] = item;
+	                        if (viewName === this.currentView) {
+	                            item.setAttribute('selected', '');
+	                        }
+	                    }.bind(this));
+	            },
+	            /**
+	             * updateds the selected vuew
+	             */
+	            _updateView: function() {
+	            	if(this.__views) {
+	            		Polymer.dom(this).querySelectorAll('view-item[selected]').
+	                    forEach(function(item) {
+	                        item.removeAttribute('selected')
+	                    });
+	                	this.__views[this.currentView].
+	                    setAttribute('selected', '');
+	            	}
+	            }
+			});
+		})();
+	</script>
+
+</dom-module>

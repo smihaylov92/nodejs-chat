@@ -11,14 +11,10 @@ app.use("/bower_components", express.static(path.join(__dirname, 'bower_componen
 // app.use("server", express.static(path.resolve(__dirname + '/server')));
 
 var messageHistory = require('./server/messageHistory');
-var basket = {}; // to do
+var users = {}; 
 
 
 messageHistory.init();
-
-console.log(__dirname);
-
-
 
 // route handler for home
 app.get('/', function(request, response){
@@ -26,14 +22,14 @@ app.get('/', function(request, response){
 });
 
 io.on('connection', function(socket){
-	console.log('a user connected');
+	io.emit('ready');
+	console.log(socket.id + ' has connected');
 
-	if(messageHistory.getMessages().length){
-		messageHistory.broadcastMessageHistory(io, socket.id);
-	}
-
-	socket.on('register', function(data){
-		//To Do
+	socket.on('register', function(username){
+		socket.username = username;
+		if(messageHistory.getMessages().length){
+			messageHistory.broadcastMessageHistory(io, socket.id);
+		}
 	});
 
 	socket.on('disconnect', function(){
@@ -41,6 +37,8 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('message', function(msgObj){
+		msgObj.user = socket.username;
+		console.log(msgObj);
 		io.emit('message', msgObj);
 		messageHistory.addMessage(msgObj);
 	});

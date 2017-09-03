@@ -37,16 +37,17 @@
 			Polymer({
 			  	is: 'add-message',
 			  	properties: {
-			  		socket : Object
+			  		// socket : Object
 			  	},
 
 			  	sendMessage: function(e){
 			  		var msgObj = {};
+					console.log(socket.id);
 
+			  		msgObj.user = socket.username;
 					msgObj.message = this.$.new_message.value;
 					msgObj.timestamp = Utils.getTimestamp();
-
-					this.socket.emit('message', msgObj);
+					socket.emit('message', msgObj);
 					this.$.new_message.value = '';
 
 					return false;
