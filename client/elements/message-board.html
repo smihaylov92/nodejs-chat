@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="message-entry.html">
+<link rel="import" href="text-message.html">
+<link rel="import" href="audio-message.html">
 <link rel="import" href="notification-entry.html">
 
 <dom-module id="message-board">
@@ -7,12 +8,10 @@
 		<style>
 			:host {
 				display: block;
-				flex-grow: 1;
 				overflow: auto;
+				flex-grow: 1;
 			}
 		</style>
-
-		<div id="messageWrapper"></div>
 	</template>
 
 	<script>
@@ -25,22 +24,48 @@
 			  	},
 			  	ready: function(){
 			  		socket.on('message', function(msgObj){
-						var newMsg = document.createElement('message-entry');
-						newMsg.date = msgObj.timestamp;
-						newMsg.text = msgObj.message;
-						newMsg.user = msgObj.user;
+			  			var newMsg = null;
 
-						Polymer.dom(this.$.messageWrapper).appendChild(newMsg);
+			  			switch(msgObj.type){
+			  				case 'T':
+			  					newMsg = document.createElement('text-message');
+								newMsg.text = msgObj.content;
+			  					break;
+
+			  				case 'A':
+			  					newMsg = document.createElement('audio-message');
+								newMsg.audio = msgObj.content;
+								console.log(msgObj.content);
+			  					break;
+			  			}
+						
+							// isOwnMessage = msgObj.user === store.user.name;
+
+						newMsg.date = msgObj.timestamp;
+						newMsg.user = msgObj.user;
+						// newMsg.user = isOwnMessage ? '' : msgObj.user;
+						// 
+						// newMsg.ownMessage = isOwnMessage; 
+
+						Polymer.dom(this.root).appendChild(newMsg);
+
+			  			this.scrollTop = this.scrollHeight;
 					}.bind(this));
 
 
 			  		socket.on('notification', function(notificationObj){
-						var newNotification = document.createElement('notification-entry');
+			  			// var isOwnNotification = notificationObj.user === store.user.name;
 
-						newNotification.user = notificationObj.user;
-						newNotification.event = notificationObj.event;
+			  			// if(!isOwnNotification){
+							var newNotification = document.createElement('notification-entry');
 
-						Polymer.dom(this.$.messageWrapper).appendChild(newNotification);
+							newNotification.user = notificationObj.user;
+							newNotification.event = notificationObj.event;
+
+							Polymer.dom(this.root).appendChild(newNotification);
+
+				  			this.scrollTop = this.scrollHeight;
+			  			// }
 					}.bind(this));
 			  	}
 			});

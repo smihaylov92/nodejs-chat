@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
+<link rel="import" href="../behaviors/redux-behavior.html">
 
 <dom-module id='login-form'>
 	<template>
@@ -36,13 +38,22 @@
 		(function () {
 			Polymer({
 				is: 'login-form',
+    			behaviors: [
+    				Polymer.IronA11yKeysBehavior,
+    				// ReduxBehavior
+    			],
 				properties: {
 					socket: Object
+				},
+				keyBindings: {
+					'enter:keypress': 'registerUser'
 				},
 
 				registerUser: function(){
 					var username = this.$.username.value;
 					if(username){
+						// console.log(ReduxBehavior)
+						// this.dispatch({type: 'update', value: username});
 						socket.username = username;
 						socket.emit('register', username);
 

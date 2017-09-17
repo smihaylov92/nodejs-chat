@@ -1,0 +1,70 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="msg-type-bar">
+	<template>
+		<style>
+			:host {
+				display: flex;
+				width: 100%;
+				height: 50px;
+				flex-direction: row;
+				flex-shrink: 0;
+			}
+
+			:host .msg-type {
+				flex-grow: 1;
+				text-align: center;
+				font-size: 20px;
+				line-height: 50px;
+			}
+
+			:host .msg-type:not(:last-child) {
+				border-right: 1px solid #000;
+			}
+
+			:host .msg-type[selected] {
+				background-color: #2f9cef;
+			}
+
+			:host .msg-type:hover {
+				cursor: pointer;
+			}
+
+		</style>
+
+		<div class="msg-type" data-type="T" on-tap="changeType" selected>Text</div>
+		<div class="msg-type" data-type="A" on-tap="changeType">Audio</div>
+		<div class="msg-type" data-type="P" on-tap="changeType">Picture</div>
+		<div class="msg-type" data-type="V" on-tap="changeType">Video</div>
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'msg-type-bar',
+			  	properties: {
+			  		currentType: {
+			  			type: String,
+			  			value: 'T'
+			  		}
+			  	},
+		  		changeType: function(e){
+		  			var clickedElem = Polymer.dom(e).localTarget,
+		  				selectedType = clickedElem.getAttribute('data-type'),
+		  				oldTypeElem = Polymer.dom(this.root).querySelector('.msg-type[selected]'),
+		  				selectedAttr = 'selected';
+
+		  			if(selectedType !== this.currentType){
+		  				oldTypeElem.removeAttribute(selectedAttr);
+		  				clickedElem.setAttribute(selectedAttr, '');
+
+		  				this.currentType = selectedType;
+						this.fire('msg-type-change', this.currentType);
+		  			}
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>

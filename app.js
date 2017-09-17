@@ -6,8 +6,9 @@ var io = require('socket.io')(http);
 var path  = require('path');
 
 app.use("/client", express.static(path.join(__dirname, 'client')));
-app.use("/lib", express.static(path.join(__dirname, 'lib')));
+app.use("/node_modules", express.static(path.join(__dirname, 'node_modules')));
 app.use("/bower_components", express.static(path.join(__dirname, 'bower_components')));
+app.use("/resources", express.static(path.join(__dirname, 'resources')));
 // app.use("server", express.static(path.resolve(__dirname + '/server')));
 
 var messageHistory = require('./server/messageHistory');

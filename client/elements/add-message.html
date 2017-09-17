@@ -1,34 +1,30 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="message-entry.html">
+<link rel="import" href="text-entry.html">
+<link rel="import" href="audio-recording.html">
 
 <dom-module id="add-message">
 	<template>
 		<style>
 			:host {
-				width: 100%;
-				height: 50px;
-				display: flex;
-				flex-direction: row;
+				flex-shrink: 0;
 			}
 
-			:host input {
-				flex-grow: 1;
-				text-indent: 10px;
-				font-size: 20px;
-			}
-
-			:host button {
-				width: 200px;
-				text-transform: uppercase;
-			}
-
-			:host button:hover {
-				cursor: pointer;
-			}
+	        :host .add-message-wrapper:not([selected]) {
+	            display: none;
+	        }
 		</style>
-
-		<input type="text" name="new_message" id="new_message">
-		<button id="send-button" on-tap="sendMessage">Send</button>
+		<div class="add-message-wrapper" data-type='T' selected>
+			<text-entry></text-entry>
+		</div>
+		<div class="add-message-wrapper" data-type='A'>
+			<audio-recording></audio-recording>
+		</div>
+		<div class="add-message-wrapper" data-type='P'>
+			<camera-tool></camera-tool>
+		</div>
+		<div class="add-message-wrapper" data-type='V'>
+			<video-recording></video-recording>
+		</div>
 	</template>
 
 	<script>
@@ -37,19 +33,17 @@
 			Polymer({
 			  	is: 'add-message',
 			  	properties: {
-			  		// socket : Object
+			  		msgType: {
+			  			type: String,
+	                    notify: true,
+	                    observer: '_updateMsgView'
+			  		}
 			  	},
 
-			  	sendMessage: function(e){
-			  		var msgObj = {};
+			  	_updateMsgView: function(){
+			  		Polymer.dom(this.root).querySelector('.add-message-wrapper[selected]').removeAttribute('selected');
 
-			  		msgObj.user = socket.username;
-					msgObj.message = this.$.new_message.value;
-					msgObj.timestamp = Utils.getTimestamp();
-					socket.emit('message', msgObj);
-					this.$.new_message.value = '';
-
-					return false;
+			  		Polymer.dom(this.root).querySelector('.add-message-wrapper[data-type="' + this.msgType + '"]').setAttribute('selected', '');
 			  	}
 			});
 		})();

@@ -1,27 +1,42 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="message-board.html">
 <link rel="import" href="add-message.html">
+<link rel="import" href="msg-type-bar.html">
 
 <dom-module id="chat-manager">
 	<template>
 		<style>
 			:host {    
-				height: 100%;
+				height: 100vh;
 			    width: 100%;
 			    display: flex;
 			    flex-direction: column;
+			    justify-content: space-between;
 			}
 		</style>
 
 		<message-board></message-board>
-		<add-message></add-message>
+		<msg-type-bar></msg-type-bar>
+		<add-message msg-type="{{msgType}}"></add-message>
 	</template>
 
 	<script>
 		(function(){
 			'use strict';
 			Polymer({
-			  	is: 'chat-manager'
+			  	is: 'chat-manager',
+			  	properties: {
+			  		msgType: {
+			  			type: String,
+			  			value: 'T'
+			  		}
+			  	},
+			  	listeners: {
+			  		'msg-type-change': 'onMsgTypeChange'
+			  	},
+			  	onMsgTypeChange: function(e){
+			  		this.msgType = e.detail;
+			  	}
 			});
 		})();
 	</script>

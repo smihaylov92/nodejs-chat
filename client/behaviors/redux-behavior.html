@@ -1,0 +1,26 @@
+<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
+<script src="../../node_modules/redux/dist/redux.js"></script> 
+<script type="text/javascript">
+    initialState = {user: {name: ''}};
+
+    store = Redux.createStore(appReducer);
+
+    var ReduxBehavior = PolymerRedux(store);
+
+    function appReducer(state, action) {
+        state = state || initialState;
+        var user = {
+            name: nameReducer(state.user.name, action)
+        };
+        return {user: user};
+    }
+
+    function nameReducer(state, action) {
+        switch (action.type) {
+            case 'update':
+                return action.value || state;
+            default:
+                return state;
+        }
+    }
+</script>

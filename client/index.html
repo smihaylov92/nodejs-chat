@@ -17,6 +17,24 @@
 	<script type="text/javascript" src="./client/utils.js"></script>
 	<script type="text/javascript">
 		var socket = io();
+
+		window.AudioContext = window.AudioContext || window.webkitAudioContext;
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+
+		// We don't need to check this over and over again, once is sufficient, the
+		// browser won't change
+		// This SHOULD be a separate element (e.g. platform-support) and be 
+		// queried whene and where needed instead of everyone implementing their own
+		// checks.
+		var canUseAudioContext = !!window.AudioContext;
+
+
+		if (canUseAudioContext) {
+			window.playContext = new AudioContext();
+		} else {
+			window.playContext = null;
+		}
+			
 	</script>
 	<app-controller></app-controller>
 </body>

@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="text-entry">
+	<template>
+		<style>
+			:host {
+				width: 100%;
+				height: 50px;
+				display: flex;
+				flex-direction: row;
+			}
+
+			:host input {
+			    height: 100%;
+			    width: 100%;
+				text-indent: 10px;
+				font-size: 20px;
+				border: 0px;
+				padding: 0px;
+				flex-grow: 1;
+			}
+
+			:host .button-wrapper {
+				width: 100px;
+				padding-top: 5px;
+				flex-shrink: 0; 
+			}
+
+			:host button {
+				display:block;
+				border-radius: 50%;
+			    border: 0px;
+			    margin: 0px;
+			    padding: 0px;
+			    position: relative;
+				height: 40px;
+				width: 40px;
+				background-color: #0213ff;
+				margin-left: 30px;
+			}
+
+			:host .send-btn img {
+				display: block;  
+				position: absolute;
+			    top: 0px;
+			    left: 0px;
+			    right: 0px;
+			    bottom: 0px;
+			    margin: auto;
+				height: 30px;
+				width: 30px; 
+			}
+
+			:host button:hover {
+				cursor: pointer;
+			}
+		</style>
+		<input type="text" name="new_message" id="new_message" placeholder="Add Message">
+		<div class="button-wrapper">
+			<button on-tap="sendMessage" class="send-btn">
+				<img src="../../resources/send.png">
+			</button>
+		</div>
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'text-entry',
+    			behaviors: [Polymer.IronA11yKeysBehavior],
+    			keyBindings: {
+    				'enter:keypress': 'sendMessage'
+    			},
+
+			  	sendMessage: function(e){
+			  		var msgObj = {};
+
+			  		msgObj.user = socket.username;
+					msgObj.content = this.$.new_message.value;
+					msgObj.timestamp = Utils.getTimestamp();
+					msgObj.type = 'T';
+					
+					socket.emit('message', msgObj);
+					this.$.new_message.value = '';
+
+					return false;
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>

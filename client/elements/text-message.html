@@ -1,0 +1,64 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="text-message">
+	<template>
+		<style>
+			:host {
+				display: block;
+				width: calc(100% - 48px);
+				margin: 20px;
+				float: left;
+				padding: 5px;
+				border: 1px solid #000000;
+				background-color: #2f9cef;
+			}
+
+			:host .message-wrapper {
+				float: left;
+			}
+
+			:host[own-message] {
+				float: right;
+			}
+
+			:host .text-wrapper {
+				font-size: 20px;
+			}
+
+			:host .date-wrapper {
+				font-size: 12px;
+			}
+		</style>
+
+		<!-- <div class="message-wrapper">  -->
+			<div class="user-wrapper">
+				<span>[[user]]</span>
+			</div>
+			<div class="text-wrapper">
+				[[text]]
+			</div>
+			<div class="date-wrapper">
+				<span>[[date]]</span>
+			</div>
+		<!-- </div> -->
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'text-message',
+			  	properties: {
+			  		text: String,
+			  		date: String,
+			  		user: String,
+			  		ownMessage: {
+			  			type: Boolean,
+			  			reflectToAttribute: true
+			  		}
+			  	}
+			});
+		})();
+	</script>
+
+</dom-module>

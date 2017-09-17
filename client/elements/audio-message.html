@@ -1,0 +1,171 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="audio-message">
+	<template>
+		<style>
+			:host {
+				display: block;
+				width: calc(100% - 48px);
+				margin: 20px;
+				float: left;
+				padding: 5px;
+				border: 1px solid #000000;
+				background-color: #2f9cef;
+			}
+
+			:host .message-wrapper {
+				float: left;
+			}
+
+			:host[own-message] {
+				float: right;
+			}
+
+			:host .date-wrapper {
+				font-size: 12px;
+			}
+		</style>
+
+		<!-- <div class="message-wrapper">  -->
+			<div class="user-wrapper">
+				<span>[[user]]</span>
+			</div>
+			<div class="audio-wrapper">
+				<!-- <audio id="audioPlayer" controls src="[[audioURL]]"></audio> -->
+				<button on-tap="_startPlaying">Start</button>
+			</div>
+			<div class="date-wrapper">
+				<span>[[date]]</span>
+			</div>
+		<!-- </div> -->
+	</template>
+
+	<script>
+		(function(){
+			'use strict';
+			Polymer({
+			  	is: 'audio-message',
+			  	properties: {
+			  		audio: {
+			  			type: Object
+			  		},
+			  		audioURL: String,
+			  		date: String,
+			  		user: String,
+			  		ownMessage: {
+			  			type: Boolean,
+			  			reflectToAttribute: true
+			  		},
+				isRecording: {
+					type: Boolean
+				},
+				audioStream: {
+					type: Object
+				},
+				recContext: {
+					type: Object
+				},
+				recorder: {
+					type: Object
+				},
+				inputRecChannel: {
+					type: Array,
+					value: []
+				},
+				recordingLength: {
+					type: Number,
+					value: 0
+				},
+				playContext: {
+					type: Object
+				},
+				playingSource: {
+					type: Object
+				},
+				outputBuffer: {
+					type: Object
+				},
+				recVolumeControl: {
+					type: Object
+				},
+				playVolumeControl: {
+					type: Object
+				},
+				dLevel: {
+					type: Number
+				},
+				isIOS: {
+					type: Boolean
+				},
+				bufferSize: {
+					type: Number,
+					value: 4096,
+					readOnly: true
+				},
+				isPlaying: {
+					type: Boolean,
+					value: false
+				},
+				blobChunks: {
+					type: Array
+				}
+			  	},
+
+			_startPlaying: function() {
+				// debugger;
+				if (window.playContext == null) return;
+
+				//ios suspends playing the context, when the source has been already stopped
+				if(window.playContext.state === 'suspended'){
+					window.playContext.resume();
+				}
+				
+					var result = new Float32Array(this.audio.recordingLength),
+						offset = 0,
+						currentBuffer = null;
+
+					for (var i = 0, len = this.audio.chunks.length; i < len; i++) {
+						currentBuffer = this.audio.chunks[i];
+						result.set(currentBuffer, offset);
+						offset += currentBuffer.length;
+					}
+					this.outputBuffer = result;
+
+				console.log(this.outputBuffer);
+				console.log(this.audio.recordingLength);
+
+				this.playVolumeControl = window.playContext.createGain();
+				this.playVolumeControl.gain.value = 1;
+				this.playingSource = window.playContext.createBufferSource();
+				this.playingSource.connect(this.playVolumeControl);
+				this.playVolumeControl.connect(window.playContext.destination);
+				this.playingSource.onended = this._stopPlaying.bind(this);
+
+
+				
+				var playBuffer = window.playContext.createBuffer(1, this.audio.recordingLength, window.playContext.sampleRate);
+				playBuffer.getChannelData(0).set(this.outputBuffer);
+				this.playingSource.buffer = playBuffer;
+				this.playingSource.start(0); // 0 for current time; ios won't play without it
+
+
+				this.currentBtn = 'stop-play-button';
+				this.isContinueBtnDisabled = true;
+				this.isRetryVisible = false;
+				this.isPlaying = true;
+			},
+
+			_stopPlaying: function() {
+				if(this.isPlaying) {
+					this.playingSource.stop();
+					this.currentBtn = 'play-button';
+					this.isContinueBtnDisabled = false;
+					this.isRetryVisible = true;
+					this.isPlaying = false;
+				}
+			}
+			});
+		})();
+	</script>
+
+</dom-module>
