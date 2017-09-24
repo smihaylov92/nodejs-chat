@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<dom-module id="audio-message">
+<dom-module id="photo-message">
 	<template>
 		<style>
 			:host {
@@ -31,7 +31,7 @@
 				<span>[[user]]</span>
 			</div>
 			<div class="audio-wrapper">
-				<audio id="audioPlayer" controls src="[[audioURL]]"></audio>
+				<img src="[[photo]]" height="50%" width="50%">
 			</div>
 			<div class="date-wrapper">
 				<span>[[date]]</span>
@@ -43,24 +43,15 @@
 		(function(){
 			'use strict';
 			Polymer({
-			  	is: 'audio-message',
+			  	is: 'photo-message',
 			  	properties: {
-			  		audio: {
-			  			type: Object,
-			  			observer: '_createAudioURL'
-			  		},
-			  		audioURL: String,
+			  		photo: String,
 			  		date: String,
 			  		user: String,
 			  		ownMessage: {
 			  			type: Boolean,
 			  			reflectToAttribute: true
 			  		}
-			  	},
-
-			  	_createAudioURL: function(){
-		        	var blob = new Blob(this.audio, {type:'audio/x-mpeg-3'});
-			  		this.audioURL = URL.createObjectURL(blob);
 			  	}
 			});
 		})();

@@ -106,6 +106,7 @@
 			<button on-tap="onRetryTap" class="reset-btn">
 				<img src="../../resources/reset.png">
 			</button>
+			<audio id="player"></audio>
 		</div>		
 		<div class="send-wrapper">
 			<button on-tap="sendMessage" class="send-btn">
@@ -125,19 +126,9 @@
 					type: String,
 					value: 'rec-button' // play-button rec-button stop-rec-button stop-play-button
 				},
-				isContinueBtnDisabled: {
-					type: Boolean,
-					value: true
-				},
 				isRetryVisible: {
 					type: Boolean,
 					value: false
-				},
-				isRecording: {
-					type: Boolean
-				},
-				audioStream: {
-					type: Object
 				},
 				recContext: {
 					type: Object
@@ -145,54 +136,18 @@
 				recorder: {
 					type: Object
 				},
-				inputRecChannel: {
+				chunks: {
 					type: Array,
 					value: []
 				},
-				recordingLength: {
-					type: Number,
-					value: 0
-				},
-				playContext: {
+				oscillator: {
 					type: Object
-				},
-				playingSource: {
-					type: Object
-				},
-				outputBuffer: {
-					type: Object
-				},
-				recVolumeControl: {
-					type: Object
-				},
-				playVolumeControl: {
-					type: Object
-				},
-				dLevel: {
-					type: Number
-				},
-				isIOS: {
-					type: Boolean
-				},
-				bufferSize: {
-					type: Number,
-					value: 4096,
-					readOnly: true
-				},
-				isPlaying: {
-					type: Boolean,
-					value: false
 				}
 			},
 
-			
-
-			detached: function() {
-                if (this.isIOS) {
-                    window.removeEventListener("recordingend", this.onIOSRecordingEnd);
-                    window.removeEventListener('ios-dLevel', this.onIOSDLevel);
-                }
-            },
+			ready: function(){
+				this.$.player.addEventListener("ended", this._stopPlaying.bind(this), false);
+			},
 
 			onCheckMicBtnTap: function(e) {
 				switch(this.currentBtn) {
@@ -212,181 +167,65 @@
 			},
 
 			_checkForInputDevice: function() {
-				navigator.getUserMedia({audio: true}, this._startRecording.bind(this), function(e) {
+				navigator.getUserMedia({audio: true, video: false}, this._startRecording.bind(this), function(e) {
 					console.log('error getting mic');
 				});
 			},
 
 			_startRecording: function(stream) {
-				this.audioStream = stream;
-				this.recContext = new AudioContext(); // new audio context everytime when rec, because the playback time of the stream must reset
-			 	var context = this.recContext,
-					audioInput = this.recContext.createMediaStreamSource(stream); // intiliazing user's mic as stream source for the audio context
-
-				this.recorder = this.recContext.createScriptProcessor(this.bufferSize, 1, 1);
-
-				// initialize volume control for recording input
-				this.recVolumeControl = this.recContext.createGain();
-				audioInput.connect(this.recVolumeControl);
-			 	this.recVolumeControl.gain.value = 1;
-			 	this.recVolumeControl.connect(this.recorder);
-
-			    this.recorder.connect(context.destination);
-
-			    // collecting input buffer data
-				this.recorder.onaudioprocess = this._processRecording.bind(this);
-
-				this.fire('start-recording');
-				this.isRecording = true;
+     			this.recContext = new AudioContext();
+ 				this.recorder = new MediaRecorder(stream, { 'mimeType' : 'audio/webm' });
+ 				this.recorder.ondataavailable = this._onDataRecording.bind(this);
+				this.recorder.start();
 				this.currentBtn = 'stop-rec-button';
 			},
 
-			_processRecording: function(e) {
-				if(!this.isRecording) {
-					return;
-				}
-
-				var inputChannelData = e.inputBuffer.getChannelData(0);
-
-
-				this.dLevel = this._getDecibelLevels(inputChannelData);
-
-		        this.inputRecChannel.push (new Float32Array (inputChannelData));
-		        this.recordingLength += this.bufferSize;
+			_onDataRecording: function(e){
+				this.chunks.push(e.data);
+		        var blob = new Blob(this.chunks, {type:'audio/x-mpeg-3'});
+		        this.$.player.src = URL.createObjectURL(blob);
 			},
 
 			_stopRecording: function() {
-				this.outputBuffer = this._convertArrayToFloat32Array();
-				this.audioStream
-					.getTracks()
-					.forEach(function(track) {
-						track.stop();
-					});
-				
-
-				this.fire('stop-recording');
-				this.isRetryVisible = true;
-				this.isRecording = false;
 				this.currentBtn = 'play-button';
-
+				this.recorder.stop();
+				if(this.recContext){
+					this.recContext.close();
+				}
 			},
 
 			_startPlaying: function() {
-				if (window.playContext == null) return;
-
-				//ios suspends playing the context, when the source has been already stopped
-				if(window.playContext.state === 'suspended'){
-					window.playContext.resume();
-				}
-
-				this.playVolumeControl = window.playContext.createGain();
-				this.playVolumeControl.gain.value = 1;
-				this.playingSource = window.playContext.createBufferSource();
-				this.playingSource.connect(this.playVolumeControl);
-				this.playVolumeControl.connect(window.playContext.destination);
-				this.playingSource.onended = this._stopPlaying.bind(this);
-
-				
-				var playBuffer = window.playContext.createBuffer(1, this.recordingLength, window.playContext.sampleRate);
-				playBuffer.getChannelData(0).set(this.outputBuffer);
-				this.playingSource.buffer = playBuffer;
-				this.playingSource.start(0); // 0 for current time; ios won't play without it
-
-
+				this.$.player.play();
 				this.currentBtn = 'stop-play-button';
-				this.isContinueBtnDisabled = true;
-				this.isRetryVisible = false;
-				this.isPlaying = true;
 			},
 
 			_stopPlaying: function() {
-				if(this.isPlaying) {
-					this.playingSource.stop();
-					this.currentBtn = 'play-button';
-					this.isContinueBtnDisabled = false;
-					this.isRetryVisible = true;
-					this.isPlaying = false;
-				}
+				this.$.player.pause();
+				this.$.player.currentTime = 0;
+				this.currentBtn = 'play-button';
 			},
 
 			_resetRecorder: function() {
-				this.outputBuffer = null;
 				this.currentBtn = 'rec-button';
-				this.isRetryVisible = false;
-				this.isContinueBtnDisabled = true;
-
-				try{
-					if(this.recContext){
-						this.recordingLength = 0;
-						this.recContext.close();
-						this.inputRecChannel = [];
-					}
-				}catch(e){
-					console.log(e)
-				}
+				this.blob = null;
+				this.chunks = [];
 			},
-
-			_convertArrayToFloat32Array: function() {
-				var result = new Float32Array(this.recordingLength),
-					offset = 0,
-					currentBuffer = null;
-
-				for (var i = 0, len = this.inputRecChannel.length; i < len; i++) {
-					currentBuffer = this.inputRecChannel[i];
-					result.set(currentBuffer, offset);
-					offset += currentBuffer.length;
-				}
-				return result;
-			},
-
-			_getDecibelLevels: function(data) {
-		        var byteSum = 0;
-                for (var i = 0; i < data.length; i++) {
-                    byteSum += Math.abs(data[i]);
-                }
-
-                return Math.sqrt(byteSum / data.length);
-		  	},
-
-			onRetryTap: function() {
-				this._resetRecorder();
-			},
-
-		  	onTimeLimitExceeded: function() {
-		  		this._stopRecording();
-		  	},
 
 		  	sendMessage: function() {
 		  		var msgObj = {};
 
 		  		msgObj.user = socket.username;
-				msgObj.content = {
-					chunks: this.inputRecChannel,
-					recordingLength: this.recordingLength
-				};
+				msgObj.content = this.chunks;
 				msgObj.timestamp = Utils.getTimestamp();
 				msgObj.type = 'A';
 
 				socket.emit('message', msgObj);
-				console.log(this.outputBuffer);
-				console.log(this.recordingLength);
-				// console.log(this.inputRecChannel);
-				// console.log(this.outputBuffer);
-				// console.log(btoa(String.fromCharCode.apply(null, new Uint8Array(this.outputBuffer.buffer))));
 
 				this._resetRecorder();
-
-				return false;
 		  	},
 
-			_arrayBufferToBase64: function( buffer ) {
-			    var binary = '';
-			    var bytes = new Uint8Array( buffer );
-			    var len = bytes.byteLength;
-			    for (var i = 0; i < len; i++) {
-			        binary += String.fromCharCode( bytes[ i ] );
-			    }
-			    return 'data:audio/ogg;base64,' + window.btoa( binary );
+		  	onRetryTap: function() {
+				this._resetRecorder();
 			}
 		});
 	})();

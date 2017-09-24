@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="text-message.html">
 <link rel="import" href="audio-message.html">
+<link rel="import" href="photo-message.html">
 <link rel="import" href="notification-entry.html">
 
 <dom-module id="message-board">
@@ -35,7 +36,11 @@
 			  				case 'A':
 			  					newMsg = document.createElement('audio-message');
 								newMsg.audio = msgObj.content;
-								console.log(msgObj.content);
+			  					break;
+
+			  				case 'P':
+			  					newMsg = document.createElement('photo-message');
+								newMsg.photo = msgObj.content;
 			  					break;
 			  			}
 						

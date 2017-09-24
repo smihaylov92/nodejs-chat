@@ -80,11 +80,9 @@
 					msgObj.content = this.$.new_message.value;
 					msgObj.timestamp = Utils.getTimestamp();
 					msgObj.type = 'T';
-					
+
 					socket.emit('message', msgObj);
 					this.$.new_message.value = '';
-
-					return false;
 			  	}
 			});
 		})();
