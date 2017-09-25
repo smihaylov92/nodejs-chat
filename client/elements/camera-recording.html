@@ -40,6 +40,21 @@
 				display: none;
 			}
 
+			:host .reset-btn {
+				height: 40px;
+				width: 40px;
+				margin: 0px;
+			}
+
+			:host .reset-btn img {
+				height: 20px;
+				width: 20px; 
+			}
+
+			:host .take-photo {
+				top: calc(50% - 40px);
+    			left: 10px;
+			}
 
 		</style>
 		<div id="open-camera" class="camera-wrapper" selected>
@@ -56,6 +71,9 @@
 			<button on-tap="sendMessage" class="send-btn">
 				<img src="../../resources/send.png">
 			</button>
+			<button on-tap="onRetryTap" class="reset-btn">
+				<img src="../../resources/reset.png">
+			</button>
 		</div>
 	</template>
 
@@ -71,6 +89,7 @@
 		  			value: 'open-camera'
 		  		}
 		  	},
+
 	  		_changeState: function(newState){
 	  			var newElem = Polymer.dom(this.root).querySelector('#' + newState),
 	  				oldElem = Polymer.dom(this.root).querySelector('.camera-wrapper[selected]'),
@@ -83,21 +102,25 @@
 	  				this.currentState = newState;
 	  			}
 		  	},
+
 			_checkForInputDevice: function(e) {
 				navigator.getUserMedia({video: true}, this._startRecording.bind(this), function(e) {
 					console.log('error getting camera');
 				});
 			},
+
 			_startRecording: function(stream){
 				this._changeState('camera-recorder');
-				this.$.camera.src = window.webkitURL.createObjectURL(stream);
+				this.$.camera.src = URL.createObjectURL(stream);
         		this.$.camera.play();
 			},
+
 			_onTakePhoto: function(){
 				this._changeState('camera-preview');
 				var context = this.$.preview.getContext('2d');
 				context.drawImage(this.$.camera, 0, 0, 640, 480);
 			},
+
 			sendMessage: function(){
 		  		var msgObj = {};
 
@@ -108,6 +131,10 @@
 
 				socket.emit('message', msgObj);
 
+				this._changeState('camera-recorder');
+			},
+
+			onRetryTap: function(){
 				this._changeState('camera-recorder');
 			}
 		});

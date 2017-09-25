@@ -44,13 +44,13 @@
 			  					break;
 			  			}
 						
-							// isOwnMessage = msgObj.user === store.user.name;
+						var isOwnMessage = msgObj.user === store.getState().user.name;
 
 						newMsg.date = msgObj.timestamp;
-						newMsg.user = msgObj.user;
-						// newMsg.user = isOwnMessage ? '' : msgObj.user;
-						// 
-						// newMsg.ownMessage = isOwnMessage; 
+						// newMsg.user = msgObj.user;
+						newMsg.user = isOwnMessage ? '' : msgObj.user;
+						
+						newMsg.ownMessage = isOwnMessage; 
 
 						Polymer.dom(this.root).appendChild(newMsg);
 
@@ -59,9 +59,9 @@
 
 
 			  		socket.on('notification', function(notificationObj){
-			  			// var isOwnNotification = notificationObj.user === store.user.name;
+			  			var isOwnNotification = notificationObj.user === store.getState().user.name;
 
-			  			// if(!isOwnNotification){
+			  			if(!isOwnNotification){
 							var newNotification = document.createElement('notification-entry');
 
 							newNotification.user = notificationObj.user;
@@ -70,7 +70,7 @@
 							Polymer.dom(this.root).appendChild(newNotification);
 
 				  			this.scrollTop = this.scrollHeight;
-			  			// }
+			  			}
 					}.bind(this));
 			  	}
 			});

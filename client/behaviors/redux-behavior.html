@@ -18,7 +18,7 @@
     function nameReducer(state, action) {
         switch (action.type) {
             case 'update':
-                return action.value || state;
+                return action.value;
             default:
                 return state;
         }

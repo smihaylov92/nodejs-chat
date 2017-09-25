@@ -5,9 +5,10 @@
 		<style>
 			:host {
 				display: block;
-				margin: 10px;
-				padding: 5px;
+				margin-bottom: 10px;
 				text-align: center;
+				width: 100%;
+				float: left;
 			}
 
 			:host-context([event="connect"]) {
@@ -20,7 +21,7 @@
 
 		</style>
 
-		<span>[[_getEventMessage(user, event)]]</span>
+		<div>[[_getEventMessage(user, event)]]</div>
 	</template>
 
 	<script>

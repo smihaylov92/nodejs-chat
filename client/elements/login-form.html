@@ -40,7 +40,7 @@
 				is: 'login-form',
     			behaviors: [
     				Polymer.IronA11yKeysBehavior,
-    				// ReduxBehavior
+    				ReduxBehavior
     			],
 				properties: {
 					socket: Object
@@ -53,7 +53,7 @@
 					var username = this.$.username.value;
 					if(username){
 						// console.log(ReduxBehavior)
-						// this.dispatch({type: 'update', value: username});
+						this.dispatch({type: 'update', value: username});
 						socket.username = username;
 						socket.emit('register', username);
 

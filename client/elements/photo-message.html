@@ -5,24 +5,27 @@
 		<style>
 			:host {
 				display: block;
-				width: calc(100% - 48px);
+				width: calc(50% - 32px);
 				margin: 20px;
 				float: left;
-				padding: 5px;
-				border: 1px solid #000000;
-				background-color: #2f9cef;
+				padding: 5px;    
+				border-radius: 10px;
+				background-color: #c1d9ff;
 			}
 
 			:host .message-wrapper {
 				float: left;
 			}
 
-			:host[own-message] {
+			:host([own-message]) {
 				float: right;
+				background-color: #2f9cef;
+				color: #ffffff;
 			}
 
 			:host .date-wrapper {
 				font-size: 12px;
+				float: right;
 			}
 		</style>
 
@@ -31,7 +34,7 @@
 				<span>[[user]]</span>
 			</div>
 			<div class="audio-wrapper">
-				<img src="[[photo]]" height="50%" width="50%">
+				<img src="[[photo]]" height="240" width="320">
 			</div>
 			<div class="date-wrapper">
 				<span>[[date]]</span>
