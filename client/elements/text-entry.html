@@ -74,15 +74,19 @@
     			},
 
 			  	sendMessage: function(e){
-			  		var msgObj = {};
+			  		var msgValue = this.$.new_message.value;
 
-			  		msgObj.user = socket.username;
-					msgObj.content = this.$.new_message.value;
-					msgObj.timestamp = Utils.getTimestamp();
-					msgObj.type = 'T';
+			  		if(msgValue){
+				  		var msgObj = {};
 
-					socket.emit('message', msgObj);
-					this.$.new_message.value = '';
+				  		msgObj.user = socket.username;
+						msgObj.content = msgValue;
+						msgObj.timestamp = Utils.getTimestamp();
+						msgObj.type = 'T';
+
+						socket.emit('message', msgObj);
+						this.$.new_message.value = '';
+			  		}
 			  	}
 			});
 		})();
